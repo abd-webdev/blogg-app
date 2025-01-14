@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
+     * @return JsonResponse
      */
-    public function listPublishedPosts()
+    public function listPublishedPosts(): JsonResponse
     {
         $posts = Post::where('status', 1)
             ->with(['author:id,name,email', 'attachments', 'comments' => function ($query) {
@@ -18,10 +25,10 @@ class PostController extends Controller
             }])
             ->get();
 
-        return response()->json($posts, 200);
+        return response()->json($posts, Response::HTTP_OK);
     }
 
-    public function getSinglePost($id)
+    public function getSinglePost($id): JsonResponse
     {
         $post = Post::where('id', $id)
             ->with(['author:id,name,email', 'attachments', 'comments'])
@@ -98,7 +105,7 @@ class PostController extends Controller
             // Delete old image if exists
             if ($post->attachments()->exists()) {
                 $oldAttachment = $post->attachments()->first();
-                \Storage::delete($oldAttachment->path);
+                Storage::delete($oldAttachment->path);
                 $oldAttachment->delete();
             }
 

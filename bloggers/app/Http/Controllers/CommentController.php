@@ -16,7 +16,11 @@ class CommentController extends Controller
      */
     public function index(Post $post)
     {
-        $comments = $post->comments()->with('user')->latest()->paginate(10);
+        $comments = $post->comments()
+            ->with('user')
+            ->whereNull('parent_id')
+            ->latest()
+            ->paginate(10);
 
         return response()->json([
             'message' => 'Comments retrieved successfully.',
@@ -108,21 +112,12 @@ class CommentController extends Controller
 
     public function getReplies(Comment $comment)
     {
-        $replies = $comment->replies()->with('user')->latest()->paginate(10);
+        $replies = $comment->replies()->with('replies.user')->get();
 
         return response()->json([
             'message' => 'Replies retrieved successfully.',
             'replies' => $replies,
         ]);
     }
-
-
-
-
-
-
-
-
-
 
 }

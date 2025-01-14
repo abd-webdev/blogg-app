@@ -7,35 +7,37 @@ use App\Http\Controllers\CommentController;
 
 require __DIR__ . '/auth.php';
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-//Routes for Posts
-
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/posts', [PostController::class, 'createPost']);
-    Route::get('/posts', [PostController::class, 'listPublishedPosts']);
-    Route::get('/posts/{id}', [PostController::class, 'getSinglePost']);
-    Route::delete('/posts/{post}', [PostController::class, 'deletePost']);
-    Route::put('/posts/{post}', [PostController::class, 'updatePost']);
-    Route::patch('/posts/{post}/publish', [PostController::class, 'publishPost']);
 
+    //Route::resource('posts', PostController::class);
+    Route::prefix('/posts')->group(function () {
+        //Routes for Posts
+        Route::post('/', [PostController::class, 'createPost']);
+        Route::get('/', [PostController::class, 'listPublishedPosts']);
+        Route::get('/{id}', [PostController::class, 'getSinglePost']);
+        Route::delete('/{post}', [PostController::class, 'deletePost']);
+        Route::put('/{post}', [PostController::class, 'updatePost']);
+        Route::patch('/{post}/publish', [PostController::class, 'publishPost']);
+
+        //Routes for Comments
+        Route::post('/{post}/comments', [CommentController::class, 'store']);
+        Route::get('/{post}/comments', [CommentController::class, 'index']);
+
+        Route::prefix('/comments')->group(function () {
+            Route::put('/{comment}', [CommentController::class, 'update']);
+            Route::delete('/{comment}', [CommentController::class, 'destroy']);
+
+            //Routes for Replies
+            Route::post('/{comment}/replies', [CommentController::class, 'storeReply']);
+            Route::get('/{comment}/replies', [CommentController::class, 'getReplies']);
+        });
+    });
+
+    Route::get('/protected-route', function () {
+        return response()->json(['message' => 'You are verified!']);
+    });
+
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
-
-//Routes for Comments
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
-    Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
-    Route::put('/comments/{comment}', [CommentController::class, 'update']);
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
-});
-
-//Routes for Replies
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/comments/{comment}/replies', [CommentController::class, 'storeReply']);
-    Route::get('/comments/{comment}/replies', [CommentController::class, 'getReplies']);
-});
-

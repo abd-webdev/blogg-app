@@ -24,11 +24,27 @@ class Comment extends Model
 
     public function replies()
     {
-        return $this->hasMany(Comment::class, 'parent_id');
+        return $this->hasMany(Comment::class, 'parent_id')->with('replies');
     }
 
     public function parent()
     {
         return $this->belongsTo(Comment::class, 'parent_id');
     }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($comment) {
+            $comment->replies()->delete();
+        });
+
+        static::restoring(function ($comment) {
+            $comment->replies()->restore();
+        });
+    }
+
+
+
 }
