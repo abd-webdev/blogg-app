@@ -16,10 +16,12 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->boolean('status')->default(0); // 0 = Draft, 1 = Published
+            $table->unsignedBigInteger('author_id'); // Foreign key for author
             $table->timestamps();
             $table->softDeletes();
-        });
 
+            $table->foreign('author_id')->references('id')->on('users')->onDelete('cascade');
+        });
     }
 
     /**

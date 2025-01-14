@@ -1,26 +1,17 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CommentController;
+
+require __DIR__ . '/auth.php';
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/register', [RegisteredUserController::class, 'store'])
-    ->middleware('guest')
-    ->name('register');
-
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-    ->middleware('guest')
-    ->name('login');
-
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('logout');
+//Routes for Posts
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [PostController::class, 'createPost']);
@@ -31,3 +22,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/posts/{post}/publish', [PostController::class, 'publishPost']);
 
 });
+
+//Routes for Comments
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
+    Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
+    Route::put('/comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+});
+
+//Routes for Replies
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/comments/{comment}/replies', [CommentController::class, 'storeReply']);
+    Route::get('/comments/{comment}/replies', [CommentController::class, 'getReplies']);
+});
+
