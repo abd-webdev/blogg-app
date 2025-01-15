@@ -13,13 +13,13 @@ class PostPolicy
     {
         //
     }
-    public function update(User $user, Post $post)
+    public function update(User $user, Post $post): bool
     {
         // Allow updates only if the user is the author of the post
         return $user->id === $post->author_id;
     }
 
-    public function delete(User $user, Post $post)
+    public function delete(User $user, Post $post): bool
     {
         return $user->id === $post->author_id;
     }

@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Auth\LoginRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request)
+    public function store(LoginRequest $request): JsonResponse
     {
         try {
             // Log incoming request
@@ -28,32 +30,33 @@ class AuthenticatedSessionController extends Controller
                 return response()->json(['message' => 'Authentication failed.'], 401);
             }
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+            if (!empty($user->createToken('auth_token')->plainTextToken)) {
+                $token = $user->createToken('auth_token')->plainTextToken;
+            }
 
             return response()->json([
                 'message' => 'Login successfully',
                 'user' => $user,
                 'token' => $token,
-            ], 201);
+            ], Response::HTTP_OK);
         } catch (\Exception $e) {
             Log::error('Login failed: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Login failed. Please check your credentials.',
-            ], 500);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
         $user = Auth::user();
         return response()->json([
             'message' => 'Logged out successfully',
             "user" => $user
-
         ]);
     }
 }
