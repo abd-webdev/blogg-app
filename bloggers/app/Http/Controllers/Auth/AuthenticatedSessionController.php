@@ -52,11 +52,21 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
-        $user = Auth::user();
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        // Delete the current access token
+        $user->currentAccessToken()->delete();
+
         return response()->json([
             'message' => 'Logged out successfully',
-            "user" => $user
-        ]);
+            'user' => $user,
+        ], Response::HTTP_OK);
     }
+
 }
