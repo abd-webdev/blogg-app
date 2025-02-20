@@ -4,15 +4,17 @@ use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
+use App\Http\Middleware\RefreshTokenExpiry;
 
 require __DIR__ . '/auth.php';
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', RefreshTokenExpiry::class])->group(function () {
 
             //Routes for Posts
       Route::resource('posts', PostController::class)
                 ->only(['index', 'store', 'show', 'update', 'destroy']);
       Route::patch('posts/{post}/publish', [PostController::class, 'publishPost']);
+
 
       //Routes for Comments
       Route::post('/posts/{post}/comments', [CommentController::class, 'store']);

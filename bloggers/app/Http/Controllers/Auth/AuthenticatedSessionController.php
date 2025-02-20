@@ -15,7 +15,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): JsonResponse
+    public function store(LoginRequest $request)
     {
         try {
             // Log incoming request
@@ -34,11 +34,13 @@ class AuthenticatedSessionController extends Controller
                 $token = $user->createToken('auth_token')->plainTextToken;
             }
 
-            return response()->json([
-                'message' => 'Login successfully',
-                'user' => $user,
-                'token' => $token,
-            ], Response::HTTP_OK);
+            // return response()->json([
+            //     'message' => 'Login successfully',
+            //     'user' => $user,
+            //     'token' => $token,
+            // ], Response::HTTP_OK);
+            return redirect()->route('login-form')->with('success', 'Logged out successfully.');
+
         } catch (\Exception $e) {
             Log::error('Login failed: ' . $e->getMessage());
             return response()->json([
@@ -50,23 +52,30 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): JsonResponse
-    {
-        $user = $request->user();
+    public function destroy(Request $request)
+{
+    $user = $request->user();
 
-        if (!$user) {
-            return response()->json([
-                'message' => 'Unauthenticated.',
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        // Delete the current access token
-        $user->currentAccessToken()->delete();
-
+    if (!$user) {
         return response()->json([
-            'message' => 'Logged out successfully',
-            'user' => $user,
-        ], Response::HTTP_OK);
+            'message' => 'Unauthenticated.',
+        ], Response::HTTP_UNAUTHORIZED);
     }
+
+    // Check if request has a Bearer Token (API token-based authentication)
+    if ($request->bearerToken()) {
+        $user->tokens()->delete(); // Delete all personal access tokens
+    } else {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    }
+
+    // return response()->json([
+    //     'message' => 'Logged out successfully',
+    // ], Response::HTTP_OK);
+    return redirect()->route('login-form')->with('success', 'Logged out successfully.');
+
+}
 
 }
