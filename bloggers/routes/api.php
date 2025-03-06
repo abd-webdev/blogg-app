@@ -1,21 +1,20 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
-use App\Http\Middleware\RefreshTokenExpiry;
 
 require __DIR__ . '/auth.php';
 
-Route::middleware(['auth:sanctum', RefreshTokenExpiry::class])->group(function () {
+Route::middleware(['auth:sanctum', 'refresh.token.expiry'])->group(function () {
 
             //Routes for Posts
       Route::resource('posts', PostController::class)
                 ->only(['index', 'store', 'show', 'update', 'destroy']);
       Route::patch('posts/{post}/publish', [PostController::class, 'publishPost']);
-
-
+     
       //Routes for Comments
       Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
       Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
@@ -29,10 +28,13 @@ Route::middleware(['auth:sanctum', RefreshTokenExpiry::class])->group(function (
           Route::get('/{comment}/replies', [CommentController::class, 'getReplies']);
 
       });
+
+        //    Dashboard Routes
+      Route::prefix('/dashboard')->group(function () {
+        Route::get('/home', [DashboardController::class,'index'])->name('dashboard.home');
+       }); 
     });
-
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-});
-
+     
+    Route::middleware('auth:sanctum')->group(function () {
+             
+    });

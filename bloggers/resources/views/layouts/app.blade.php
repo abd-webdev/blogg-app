@@ -7,16 +7,18 @@
     <title>@yield('title', 'Blogging App')</title>
     
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/font-awesome.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     @stack('styles')
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">Blogging App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -62,15 +64,27 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav> -->
 
-    <!-- Main Content -->
-    <div class="container mt-4">
-        @yield('content')
+    <div>
+        @include('layouts.header');
     </div>
 
+    <!-- Main Content -->
+    
+    <div class="row">
+       <div class="container my-5 col-md-7">
+           @yield('content')
+        </div>
+        <div class="col-md-5">
+            @include('layouts.sidebar')
+        </div>
+    </div>
+
+    
+
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-4">
+    <!-- <footer class="bg-dark text-white text-center py-3 mt-4">
         <div class="container">
             <p class="mb-0">&copy; {{ date('Y') }} Blogging App. All rights reserved.</p>
             <p class="mb-0">
@@ -79,8 +93,11 @@
                 <a href="{{ url('/') }}" class="text-white">Home</a>
             </p>
         </div>
-    </footer>
+    </footer> -->
 
+    <div>
+        @include('layouts.footer');
+    </div>
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

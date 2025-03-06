@@ -39,10 +39,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-
-        return response()->json([
-            'message' => 'User registered successfully. Please check your email to verify your account.',
-            'user' => $user,
-        ], 201);
+        return redirect()->route('login');
     }
 }

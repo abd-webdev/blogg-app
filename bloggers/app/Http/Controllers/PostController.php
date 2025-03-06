@@ -70,7 +70,7 @@ class PostController extends Controller
         }
 
         // Redirect to post list with success message
-        return redirect()->route('posts.index')->with('success', 'Post created successfully!');
+        return redirect()->route('dashboard.home')->with('success', 'Post created successfully!');
     }
 
     /**
@@ -152,7 +152,7 @@ class PostController extends Controller
 
         // Redirect to post list with success message
         return redirect()->route('posts.index')->with('success', 'Post updated successfully!');
-    }
+        }
 
     /**
      * Remove the specified resource from storage.
@@ -161,11 +161,9 @@ class PostController extends Controller
     {
         $this->authorize('delete', $post);
 
-        // Delete associated attachments
         $post->attachments()->delete();
         $post->delete();
 
-        // Handle API Response
         if (request()->wantsJson()) {
             return response()->json(['message' => 'Post deleted successfully'], Response::HTTP_OK);
         }

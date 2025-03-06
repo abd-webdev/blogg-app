@@ -16,19 +16,20 @@ class RefreshTokenExpiry
 
         if ($user) {
             $token = $user->currentAccessToken();
-
-            if ($token) {
-                $lastUsedAt = Carbon::parse($token->updated_at);
+            
+            // Ensure the token is an instance of PersonalAccessToken
+            if ($token instanceof PersonalAccessToken) {
+                $lastUsedAt = $token->last_used_at ? Carbon::parse($token->last_used_at) : null;
                 $now = Carbon::now();
 
-                // If token is inactive for more than 1 hour, revoke it
-                if ($lastUsedAt->diffInMinutes($now) >= 60) {
+                // If token was last used more than 60 minutes ago, revoke it
+                if ($lastUsedAt && $lastUsedAt->diffInMinutes($now) >= 1) {
                     $token->delete();
-                    return response()->json(['message' => 'Token expired due to inactivity'], Response::HTTP_UNAUTHORIZED);
+                    return redirect()->route('login-form')->with('success', 'Logged out due to inactivity');
                 }
 
-                // Extend the token expiry by updating `updated_at`
-                $token->forceFill(['updated_at' => now()])->save();
+                // Update `last_used_at` to extend expiration
+                $token->forceFill(['last_used_at' => now()])->save();
             }
         }
 

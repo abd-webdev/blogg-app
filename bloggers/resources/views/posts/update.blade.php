@@ -2,9 +2,10 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2>Create a New Post</h2>
-    <form action={{ "/api/posts" }} method="POST" enctype="multipart/form-data">
+    <h2>Update Post</h2>
+    <form action={{ route('posts', ) }} method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT') 
         <div class="mb-3">
             <label class="form-label">Title</label>
             <input type="text" name="title" class="form-control" placeholder="Enter post title" required>
