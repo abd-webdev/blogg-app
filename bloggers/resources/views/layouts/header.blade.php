@@ -33,7 +33,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <ul class='menu'>
-                        <li><a href="{{ route('home') }}">Posts</a></li>
+                        <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href='{{ url('/') }}'>Entertainment</a></li>
                         <li><a href='{{ url('/') }}'>Sports</a></li>
                         <li><a href='{{ url('/') }}'>Politics</a></li>

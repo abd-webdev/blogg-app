@@ -38,6 +38,9 @@
                 <div class="col-md-8">
                     <ul class="admin-menu">
                         <li>
+                            <a href="{{ route('home') }}">Home</a>
+                        </li>
+                        <li>
                             <a href="{{ route('dashboard.home') }}">Post</a>
                         </li>
                         <li>

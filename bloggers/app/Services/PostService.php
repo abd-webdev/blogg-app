@@ -17,7 +17,8 @@ class PostService
         ]);
 
         if ($image) {
-            $path = $image->store('public/posts');
+            $path = $image->store('posts', 'public');
+        
             $post->attachments()->create([
                 'path' => $path,
                 'type' => 'image'

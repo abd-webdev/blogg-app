@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 use App\Models\Post;
-
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
-    public function index(){
-        $posts = Post::orderBy("created_at","desc")->paginate(10);
-        return view("layouts.home")->with(['posts' => $posts]);
-    }
+    public function index()
+{
+    return view("layouts.home"); // No need to manually pass posts!
+}
 }

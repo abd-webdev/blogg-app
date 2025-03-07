@@ -13,7 +13,7 @@ Route::middleware(['auth:sanctum', 'refresh.token.expiry'])->group(function () {
             //Routes for Posts
       Route::resource('posts', PostController::class)
                 ->only(['index', 'store', 'show', 'update', 'destroy']);
-      Route::patch('posts/{post}/publish', [PostController::class, 'publishPost']);
+      Route::get('posts/{post}/publish', [PostController::class, 'publishPost'])->name('posts.publish');
      
       //Routes for Comments
       Route::post('/posts/{post}/comments', [CommentController::class, 'store']);

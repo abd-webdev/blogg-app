@@ -15,7 +15,6 @@ class PostPolicy
     }
     public function update(User $user, Post $post): bool
     {
-        // Allow updates only if the user is the author of the post
         return $user->id === $post->author_id;
     }
 

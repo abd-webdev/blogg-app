@@ -50,6 +50,11 @@ class PostController extends Controller
         return view('posts.create');
     }
 
+    public function edit($id){
+        $post = Post::findOrFail($id);
+        return view('posts.update', compact('post'));
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -61,21 +66,15 @@ class PostController extends Controller
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
         ]);
 
-        // Delegate post creation to PostService
         $post = $this->postService->createPost($validated, $request->file('image'));
 
-        // Handle API Response
         if ($request->wantsJson()) {
             return response()->json(['message' => 'Post created successfully', 'post' => $post->load('attachments')], Response::HTTP_OK);
         }
 
-        // Redirect to post list with success message
         return redirect()->route('dashboard.home')->with('success', 'Post created successfully!');
     }
 
-    /**
-     * Display the specified post (Supports JSON & Blade View)
-     */
     public function show(Request $request, $id)
     {
         $post = Post::where('id', $id)
@@ -83,10 +82,7 @@ class PostController extends Controller
             ->first();
 
         if (!$post) {
-            if ($request->wantsJson()) {
-                return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
-            }
-            return redirect()->route('posts.index')->with('error', 'Post not found.');
+            return redirect()->route('home')->with('error', 'Post not found.');
         }
 
         // Return JSON if request is from API
@@ -105,10 +101,14 @@ class PostController extends Controller
     public function publishPost(Post $post)
     {
         $this->authorize('update', $post);
-
+      
+        if($post->status == '0') {
         $post->update(['status' => 1]);
+        }else{
+            $post->update(['status' => 0]);
+        }
 
-        return response()->json(['message' => 'Post published successfully'], Response::HTTP_OK);
+    return redirect()->route('dashboard.home')->with('success', 'Post updated successfully!');   
     }
 
     /**
@@ -122,36 +122,29 @@ class PostController extends Controller
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
             'status' => 'sometimes|boolean',
-            'image' => 'sometimes|image|mimes:jpg,png,jpeg|max:2048'
+            'image' => 'sometimes|image|mimes:jpg,png,jpeg,jfif|max:2048'
         ]);
 
-        // Update post details
         $post->update($validated);
 
-        // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($post->attachments()->exists()) {
+             if ($post->attachments()->exists()) {
                 $oldAttachment = $post->attachments()->first();
-                Storage::delete($oldAttachment->path);
                 $oldAttachment->delete();
             }
 
-            // Save new image
-            $path = $request->file('image')->store('public/posts');
+            $path = $request->file('image')->store('posts','public');
             $post->attachments()->create([
                 'path' => $path,
                 'type' => 'image'
             ]);
         }
 
-        // Handle API Response
         if ($request->wantsJson()) {
             return response()->json(['message' => 'Post updated successfully', 'post' => $post->load('attachments')], Response::HTTP_OK);
         }
 
-        // Redirect to post list with success message
-        return redirect()->route('posts.index')->with('success', 'Post updated successfully!');
+        return redirect()->route('dashboard.home')->with('success', 'Post updated successfully!');
         }
 
     /**
@@ -169,6 +162,6 @@ class PostController extends Controller
         }
 
         // Redirect to post list with success message
-        return redirect()->route('posts.index')->with('success', 'Post deleted successfully!');
+        return redirect()->route('dashboard.home')->with('success', 'Post deleted successfully!');
     }
 }
